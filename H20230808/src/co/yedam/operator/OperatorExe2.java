@@ -21,22 +21,26 @@ public class OperatorExe2 {
 			if (menu == 1) {
 				System.out.print("입금액 입력>> ");
 				int insert = Integer.parseInt(scn.nextLine());
-				if (insert > 100000 || insert < 0) {
-					
+				if (insert > 100000) {
+					System.out.println("10만원 이상은 불가합니다");
 					continue;
-				}
+				} else if (insert < 0) {
+					System.out.println("마이너스 금액은 불가합니다");
 				// 코드작성
 			} else if (menu == 2) {
 				System.out.println("출금액 입력>> ");
-				int insert = Integer.parseInt(scn.nextLine());
-				if (insert > 100000 || insert < 0) {
-					break;
+				if (insert > 100000) {
+					System.out.println("10만원 이상은 불가합니다");
+					continue;
+				} else if (insert < 0) {
+					System.out.println("마이너스 금액은 불가합니다");
 				// 코드작성
 			} else if (menu == 3) {
 				
 				// 코드작성
 			}
 			} else if (menu == 4) {
+					
 				// 코드작성
 			}	
 		}
