@@ -40,7 +40,7 @@ public class OperatorExe2 {
 				// 코드작성
 			}
 			} else if (menu == 4) {
-					
+				break;
 				// 코드작성
 			}	
 		}
