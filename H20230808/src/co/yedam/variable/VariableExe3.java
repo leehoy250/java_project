@@ -9,7 +9,7 @@ public class VariableExe3 {
 		System.out.println("num: " + num);
 		int num1 = 200; // 로컬변수는 선언된 실행블럭안에서만 유효값
 	}
-	
+	int num1 = 200;
 	public void printNum() {
 		System.out.println("num: " + num1);
 	}
