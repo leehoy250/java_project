@@ -1,6 +1,5 @@
 package co.yedam.operator;
 
-import java.util.Scanner;
 
 /*
  * 은행 App.
