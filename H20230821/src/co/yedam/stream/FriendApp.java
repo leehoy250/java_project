@@ -89,7 +89,7 @@ public class FriendApp {
 			while(true) {
 				String line = null;
 				try {
-					line = scn.nextLine();
+					line = scn.nextLine(); // 한 라인씩 읽어들임
 				} catch(NoSuchElementException e) {
 					break;				
 				}
