@@ -1,4 +1,4 @@
-package co.yedam.board;
+package co.yedam.board.service;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,28 +7,31 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoardServiceJdbc implements BoardService{
-	
-	// Connection 객체 db연결하기위한 객체
-	// PreparedStatement 객체
-	// ResultSet 객체 결과를 잠시 담아두기 위한 객체
-	// String 쿼리
+import co.yedam.board.common.Dao;
+import co.yedam.board.vo.Board;
+
+public class BoardServiceJdbc implements BoardService {
+
+	// Connection 객체.
+	// PreparedStatement 객체.
+	// ResultSet 객체.
+	// String 쿼리.
 	Connection conn;
 	PreparedStatement psmt;
 	ResultSet rs;
 	String query;
-	
+
 	void disconn() {
 		try {
-		if (rs != null) {
-			rs.close();
-		}
-		if (psmt != null) {
-			psmt.close();
-		}
-		if (conn != null) {
-			conn.close();
-		}
+			if (rs != null) {
+				rs.close();
+			}
+			if (psmt != null) {
+				psmt.close();
+			}
+			if (conn != null) {
+				conn.close();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -36,17 +39,17 @@ public class BoardServiceJdbc implements BoardService{
 
 	@Override
 	public boolean add(Board board) {
-		query = "insert into board (brd_no, brd_title, brd_content, brd_writer) "//
-				+ "values ((select nvl(max(brd_no), 0) + 1 from board), ?, ?, ?)";
+		query = "insert into board (brd_no, brd_title, brd_content, brd_writer) "
+				+ "values ( (select nvl(max(brd_no), 0) + 1 from board) ,?,?,?)";
 		conn = Dao.conn();
 		try {
 			psmt = conn.prepareStatement(query);
-			psmt.setString(1, board.getBrdTitle()); // 첫번째 물음표
-			psmt.setString(2, board.getBrdContent()); // 두번째 물음표
-			psmt.setString(3, board.getBrdWriter());  // 세번째 물음표
-			
-			int r = psmt.executeUpdate();
-			if(r == 1) {
+			psmt.setString(1, board.getBrdTitle());
+			psmt.setString(2, board.getBrdContent());
+			psmt.setString(3, board.getBrdWriter());
+
+			int r = psmt.executeUpdate();// insert, update, delete
+			if (r == 1) {
 				return true;
 			}
 		} catch (SQLException e) {
@@ -56,33 +59,30 @@ public class BoardServiceJdbc implements BoardService{
 		}
 		return false;
 	}
-	
 
 	@Override
 	public List<Board> list(int page) {
 		List<Board> list = new ArrayList<Board>();
-		
+
 		conn = Dao.conn();
-		query = "select * \r\n" //
-				+ "from (select rownum rn, a.*\r\n" // \r\n: 줄바꿈
-				+ "      from (select * from board\r\n" //
-				+ "            order by brd_no) a\r\n" //
-				+ "      where rownum <= (? * 5)) b\r\n" //
-				+ "where b.rn > (? - 1) * 5"; // sql
+		query = "select *  " //
+				+ "from (select rownum  rn, a.*  " //
+				+ "      from (select * from board " //
+				+ "            order by brd_no) a " //
+				+ "      where rownum <= (? * 5) ) b " //
+				+ "where b.rn > (? - 1) * 5";// sql
 		try {
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, page);
 			psmt.setInt(2, page);
-			
+
 			rs = psmt.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				// rs -> list
-				System.out.println(rs.getInt("brd_no"));
 				Board board = new Board();
 				board.setBrdNo(rs.getInt("brd_no"));
 				board.setBrdTitle(rs.getString("brd_title"));
 				board.setBrdWriter(rs.getString("brd_writer"));
-				
 				list.add(board);
 			}
 		} catch (SQLException e) {
@@ -99,7 +99,7 @@ public class BoardServiceJdbc implements BoardService{
 		conn = Dao.conn();
 		try {
 			psmt = conn.prepareStatement(query);
-			rs = psmt.executeQuery();
+			rs = psmt.executeQuery(); // select
 			if (rs.next()) {
 				return rs.getInt("cnt");
 			}
@@ -113,23 +113,24 @@ public class BoardServiceJdbc implements BoardService{
 
 	@Override
 	public boolean modify(Board board) {
-	//query = "update board set brd_content = '" + board.getBrdContent() + "' where brd_no = " + getBrdNo();
-	query = "update board set brd_content = ?  where brd_no = ? ";
-	conn = Dao.conn();
-	try {
-		psmt = conn.prepareStatement(query);
-		psmt.setString(1, board.getBrdContent()); // 첫번째 물음표에 값이 들어감
-		psmt.setInt(2, board.getBrdNo()); // 두번째 물음표에 값이 들어감
-		int r = psmt.executeUpdate();
-		if(r == 1) {
-			return true;
+//		query = "update board set brd_content = '" //
+//				+ board.getBrdContent() + "' where brd_no = " + board.getBrdNo();
+		query = "update board set brd_content = ? where brd_no = ?";
+		conn = Dao.conn();
+		try {
+			psmt = conn.prepareStatement(query);
+			psmt.setString(1, board.getBrdContent());
+			psmt.setInt(2, board.getBrdNo());
+			int r = psmt.executeUpdate();// insert, update, delete
+			if (r == 1) {
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			disconn();
 		}
-	} catch (SQLException e) {
-		e.printStackTrace();
-	} finally {
-		disconn();
-	}
-	return false;
+		return false;
 	}
 
 	@Override
@@ -138,12 +139,14 @@ public class BoardServiceJdbc implements BoardService{
 		conn = Dao.conn();
 		try {
 			psmt = conn.prepareStatement(query);
-			int r = psmt.executeUpdate(); // executeUpdate : insert, update, delete할때 사용하는 메소드
+			int r = psmt.executeUpdate();// insert, update, delete
 			if (r == 1) {
 				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			disconn();
 		}
 		return false;
 	}
@@ -154,15 +157,11 @@ public class BoardServiceJdbc implements BoardService{
 		conn = Dao.conn();
 		try {
 			psmt = conn.prepareStatement(query);
-			rs = psmt.executeQuery(); // executeQuery : select할때 사용하는 메소드
+			rs = psmt.executeQuery(); // select
 			if (rs.next()) {
 				Board board = new Board();
 				board.setBrdNo(rs.getInt("brd_no"));
-				board.setBrdTitle(rs.getString("brd_title"));
-				board.setBrdWriter(rs.getString("brd_writer"));
 				board.setWriteDate(rs.getDate("write_date"));
-				board.setUpdateDate(rs.getDate("update_date"));
-				
 				return board;
 			}
 		} catch (SQLException e) {
@@ -175,9 +174,8 @@ public class BoardServiceJdbc implements BoardService{
 
 	@Override
 	public void save() {
-		
-	}
 
+	}
 
 	@Override
 	public String getResponseUser(int brdNo) {
@@ -186,7 +184,7 @@ public class BoardServiceJdbc implements BoardService{
 		try {
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, brdNo);
-			rs = psmt.executeQuery(); // executeQuery : select할때 사용하는 메소드
+			rs = psmt.executeQuery(); // select
 			if (rs.next()) {
 				return rs.getString("brd_writer");
 			}
@@ -197,4 +195,5 @@ public class BoardServiceJdbc implements BoardService{
 		}
 		return null;
 	}
+
 }

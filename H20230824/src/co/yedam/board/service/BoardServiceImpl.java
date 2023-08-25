@@ -1,4 +1,4 @@
-package co.yedam.board;
+package co.yedam.board.service;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,48 +8,47 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class BoardServiceImpl implements BoardService{
+import co.yedam.board.vo.Board;
+
+public class BoardServiceImpl implements BoardService {
 
 	List<Board> boardList = new ArrayList<>();
-	
+
 	public BoardServiceImpl() {
 		init();
 	}
-	
+
 	private void init() {
 		try {
-			FileInputStream fis = new FileInputStream("c:/temp/board.dat");
-			ObjectInputStream ois = new ObjectInputStream(fis);
+			FileInputStream fis = //
+					new FileInputStream("c:/temp/board.dat");
+			ObjectInputStream ois = //
+					new ObjectInputStream(fis);
 			boardList = (List<Board>) ois.readObject();
-			
+
 			ois.close();
 			fis.close();
-			
+
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
-	
+
 	private int getMaxNo() {
 		int brdNo = 0;
-		for (int i=0; i<boardList.size(); i++) {
+		for (int i = 0; i < boardList.size(); i++) {
 			if (boardList.get(i).getBrdNo() > brdNo) {
 				brdNo = boardList.get(i).getBrdNo();
 			}
 		}
 		return brdNo + 1;
 	}
-	
-	private Date getDate() {
-		Date nowTime = new Date();
-		return nowTime;
-	}
-	
+
 	@Override
 	public boolean add(Board board) {
 		board.setBrdNo(getMaxNo());
-		board.setWriteDate(getDate());
-		board.setUpdateDate(getDate());
+		board.setWriteDate(new Date());
+		board.setUpdateDate(new Date());
 		return boardList.add(board);
 	}
 
@@ -60,7 +59,7 @@ public class BoardServiceImpl implements BoardService{
 		List<Board> pageList = new ArrayList<>();
 		for (int i = 0; i < boardList.size(); i++) {
 			if (i >= start && i < end) {
-				pageList.add(boardList.get(i));				
+				pageList.add(boardList.get(i));
 			}
 		}
 		return pageList;
@@ -68,10 +67,11 @@ public class BoardServiceImpl implements BoardService{
 
 	@Override
 	public boolean modify(Board board) {
-		for (int i=0; i<boardList.size(); i++) {
-			if (boardList.get(i).getBrdNo() == board.getBrdNo()) {
+		for (int i = 0; i < boardList.size(); i++) {
+			if (boardList.get(i).getBrdNo() //
+					== board.getBrdNo()) {
 				boardList.get(i).setBrdContent(board.getBrdContent());
-				boardList.get(i).setUpdateDate(getDate());
+				boardList.get(i).setUpdateDate(new Date());
 				return true;
 			}
 		}
@@ -80,7 +80,7 @@ public class BoardServiceImpl implements BoardService{
 
 	@Override
 	public boolean remove(int brdNo) {
-		for (int i=0; i<boardList.size(); i++) {
+		for (int i = 0; i < boardList.size(); i++) {
 			if (boardList.get(i).getBrdNo() == brdNo) {
 				boardList.remove(i);
 				return true;
@@ -91,22 +91,25 @@ public class BoardServiceImpl implements BoardService{
 
 	@Override
 	public Board search(int brdNo) {
-		for (int i=0; i<boardList.size(); i++) {
+		for (int i = 0; i < boardList.size(); i++) {
 			if (boardList.get(i).getBrdNo() == brdNo) {
 				return boardList.get(i);
 			}
 		}
 		return null;
 	}
+
 	@Override
 	public void save() {
 		try {
 			FileOutputStream fos = new FileOutputStream("c:/temp/board.dat");
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(boardList);
-			oos.flush();oos.close();
-			fos.flush();fos.close();
-			
+			oos.flush();
+			oos.close();
+			fos.flush();
+			fos.close();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -119,9 +122,9 @@ public class BoardServiceImpl implements BoardService{
 
 	@Override
 	public String getResponseUser(int brdNo) {
-		for (int i=0; i < boardList.size(); i++) {
+		for (int i = 0; i < boardList.size(); i++) {
 			if (boardList.get(i).getBrdNo() == brdNo) {
-				
+				return boardList.get(i).getBrdWriter();
 			}
 		}
 		return null;

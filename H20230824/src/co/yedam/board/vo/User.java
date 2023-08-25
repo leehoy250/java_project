@@ -1,24 +1,18 @@
-package co.yedam.board;
+package co.yedam.board.vo;
 
 public class User {
 	private String userId;
 	private String userPw;
 	private String userNm;
-	
+
+	public User() {
+	}
+
 	public User(String userId, String userPw, String userNm) {
 		super();
 		this.userId = userId;
 		this.userPw = userPw;
 		this.userNm = userNm;
-	}
-
-	public User(String userId, String userPw) {
-		super();
-		this.userId = userId;
-		this.userPw = userPw;
-	}
-	
-	public User() {
 	}
 
 	public String getUserId() {
@@ -44,8 +38,5 @@ public class User {
 	public void setUserNm(String userNm) {
 		this.userNm = userNm;
 	}
-	
-	
+
 }
-
-
